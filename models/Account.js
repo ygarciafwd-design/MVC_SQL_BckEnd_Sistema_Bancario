@@ -3,8 +3,24 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class Account extends Model {
-    static associate(models) {
+  /**
+ * Account Model
+ * Represents a financial account belonging to a user.
+ * 
+ * @property {number} id - Primary Key
+ * @property {string} accountNumber - Unique account number
+ * @property {number} userId - ID of the owner
+ * @property {number} accountTypeId - ID of the type of account
+ * @property {number} balance - Current balance
+ * @property {string} currency - Currency code (e.g., USD)
+ * @property {string} status - Account status (active, inactive, frozen, closed)
+ */
+class Account extends Model {
+  /**
+   * Defines associations with other models.
+   * @param {Object} models - Registry of all initialized models.
+   */
+  static associate(models) {
       Account.belongsTo(models.User, {
         foreignKey: 'user_id',
         as: 'user',

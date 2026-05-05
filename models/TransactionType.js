@@ -3,8 +3,20 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class TransactionType extends Model {
-    static associate(models) {
+  /**
+ * TransactionType Model
+ * Defines different types of transactions (e.g., Deposit, Withdrawal, Transfer).
+ * 
+ * @property {number} id - Primary Key
+ * @property {string} name - Human readable name
+ * @property {string} description - Detailed explanation of the transaction type
+ */
+class TransactionType extends Model {
+  /**
+   * Defines associations with other models.
+   * @param {Object} models - Registry of all initialized models.
+   */
+  static associate(models) {
       TransactionType.hasMany(models.Transaction, {
         foreignKey: 'transaction_type_id',
         as: 'transactions',

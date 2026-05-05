@@ -3,8 +3,25 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class AuditLog extends Model {
-    static associate(models) {
+  /**
+ * AuditLog Model
+ * Tracks all sensitive actions performed by users in the system.
+ * 
+ * @property {number} id - Primary Key
+ * @property {number} userId - ID of the user who performed the action
+ * @property {string} action - Description of the action (e.g., TRANSFER)
+ * @property {string} entity - Name of the affected entity
+ * @property {number} entityId - ID of the affected record
+ * @property {Object} previousData - State before the action
+ * @property {Object} newData - State after the action
+ * @property {string} ipAddress - IP address of the requester
+ */
+class AuditLog extends Model {
+  /**
+   * Defines associations with other models.
+   * @param {Object} models - Registry of all initialized models.
+   */
+  static associate(models) {
       AuditLog.belongsTo(models.User, {
         foreignKey: 'user_id',
         as: 'user',

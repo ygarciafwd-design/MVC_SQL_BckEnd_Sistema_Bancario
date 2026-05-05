@@ -3,8 +3,26 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class Transaction extends Model {
-    static associate(models) {
+  /**
+ * Transaction Model
+ * Records any financial movement in the system.
+ * 
+ * @property {number} id - Primary Key
+ * @property {string} referenceNumber - Unique transaction reference
+ * @property {number} sourceAccountId - Origin account (optional for deposits)
+ * @property {number} destinationAccountId - Target account (optional for withdrawals)
+ * @property {number} transactionTypeId - Type of transaction
+ * @property {number} amount - Monetary value
+ * @property {string} currency - Currency code
+ * @property {string} description - Memo or note
+ * @property {string} status - Transaction status (pending, completed, failed, cancelled, reversed)
+ */
+class Transaction extends Model {
+  /**
+   * Defines associations with other models.
+   * @param {Object} models - Registry of all initialized models.
+   */
+  static associate(models) {
       Transaction.belongsTo(models.Account, {
         foreignKey: 'source_account_id',
         as: 'sourceAccount',

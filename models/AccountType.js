@@ -3,8 +3,20 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class AccountType extends Model {
-    static associate(models) {
+  /**
+ * AccountType Model
+ * Defines different types of accounts (e.g., Savings, Checking).
+ * 
+ * @property {number} id - Primary Key
+ * @property {string} name - Human readable name
+ * @property {string} description - Detailed explanation of the account type
+ */
+class AccountType extends Model {
+  /**
+   * Defines associations with other models.
+   * @param {Object} models - Registry of all initialized models.
+   */
+  static associate(models) {
       AccountType.hasMany(models.Account, {
         foreignKey: 'account_type_id',
         as: 'accounts',
