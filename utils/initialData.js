@@ -36,7 +36,19 @@ const transactionTypes = [
   }
 ];
 
+const roles = [
+  {
+    name: 'admin',
+    description: 'Administrador del sistema'
+  },
+  {
+    name: 'client',
+    description: 'Cliente regular'
+  }
+];
+
 module.exports = {
   accountTypes,
-  transactionTypes
+  transactionTypes,
+  roles
 };

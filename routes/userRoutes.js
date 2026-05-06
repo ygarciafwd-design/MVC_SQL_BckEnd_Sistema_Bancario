@@ -5,7 +5,8 @@ const authenticate = require('../middleware/authenticate');
 const authorize = require('../middleware/authorize');
 
 router.get('/', authenticate, authorize('admin'), UserController.getAll);
-router.post('/', UserController.create); // Registration could be public
+router.post('/', UserController.create);
 router.get('/:id', authenticate, UserController.getById);
+router.delete('/:id', authenticate, authorize('admin'), UserController.delete);
 
 module.exports = router;

@@ -1,5 +1,5 @@
-const { AccountType, TransactionType } = require('../models');
-const { accountTypes, transactionTypes } = require('../utils/initialData');
+const { AccountType, TransactionType, Role } = require('../models');
+const { accountTypes, transactionTypes, roles } = require('../utils/initialData');
 
 /**
  * Service to initialize the database with master data if it's empty
@@ -22,6 +22,14 @@ const initializeDatabase = async () => {
       console.log('Seeding Transaction Types...');
       await TransactionType.bulkCreate(transactionTypes);
       console.log('Transaction Types seeded successfully.');
+    }
+
+    // 3. Initialize Roles
+    const roleCount = await Role.count();
+    if (roleCount === 0) {
+      console.log('Seeding Roles...');
+      await Role.bulkCreate(roles);
+      console.log('Roles seeded successfully.');
     }
 
     console.log('Database initialization check complete.');

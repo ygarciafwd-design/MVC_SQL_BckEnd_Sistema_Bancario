@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { User } = require('../models');
+const { User, Role } = require('../models');
 
 /**
  * Middleware de autenticación JWT
@@ -21,7 +21,8 @@ const authenticate = async (req, res, next) => {
 
     // 3. Buscar el usuario en la base de datos
     const user = await User.findByPk(decoded.id, {
-      attributes: { exclude: ['passwordHash'] }
+      attributes: { exclude: ['passwordHash'] },
+      include: [{ model: Role, as: 'role' }]
     });
 
     if (!user) {

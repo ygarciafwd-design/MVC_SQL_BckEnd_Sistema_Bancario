@@ -35,6 +35,11 @@ class User extends Model {
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       });
+
+      User.belongsTo(models.Role, {
+        foreignKey: 'role_id',
+        as: 'role',
+      });
     }
   }
 
@@ -101,10 +106,9 @@ class User extends Model {
         allowNull: false,
         defaultValue: 'pending',
       },
-      role: {
-        type: DataTypes.ENUM('admin', 'client'),
+      role_id: {
+        type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
-        defaultValue: 'client',
       },
     },
     {

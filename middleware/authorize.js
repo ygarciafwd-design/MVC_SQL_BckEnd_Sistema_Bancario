@@ -16,9 +16,9 @@ const authorize = (...allowedRoles) => {
       return res.status(401).json({ message: 'Authentication required.' });
     }
 
-    if (!allowedRoles.includes(req.user.role)) {
+    if (!req.user.role || !allowedRoles.includes(req.user.role.name)) {
       return res.status(403).json({
-        message: `Access denied. Required role: ${allowedRoles.join(' or ')}. Your role: ${req.user.role}.`
+        message: `Access denied. Required role: ${allowedRoles.join(' or ')}. Your role: ${req.user.role ? req.user.role.name : 'undefined'}.`
       });
     }
 

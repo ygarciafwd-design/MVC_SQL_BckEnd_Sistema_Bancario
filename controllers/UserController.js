@@ -38,6 +38,11 @@ class UserController {
           userData.status = 'active';
       }
 
+      // Default role to 'client' (assuming ID 2 is client based on seed)
+      if (!userData.role_id) {
+          userData.role_id = 2;
+      }
+
       const user = await User.create(userData);
       
       // Remove passwordHash from response
@@ -60,6 +65,21 @@ class UserController {
       });
       if (!user) return res.status(404).json({ message: 'User not found' });
       res.json(user);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  /**
+   * Delete a user
+   */
+  static async delete(req, res) {
+    try {
+      const user = await User.findByPk(req.params.id);
+      if (!user) return res.status(404).json({ message: 'User not found' });
+      
+      await user.destroy();
+      res.json({ message: 'User deleted successfully' });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

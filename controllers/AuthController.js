@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { User } = require('../models');
+const { User, Role } = require('../models');
 
 class AuthController {
   /**
@@ -17,7 +17,10 @@ class AuthController {
       }
 
       // 2. Find user by email
-      const user = await User.findOne({ where: { email } });
+      const user = await User.findOne({ 
+        where: { email },
+        include: [{ model: Role, as: 'role' }]
+      });
       if (!user) {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
@@ -35,7 +38,7 @@ class AuthController {
 
       // 5. Generate token
       const token = jwt.sign(
-        { id: user.id, email: user.email, role: user.role },
+        { id: user.id, email: user.email, role: user.role.name },
         process.env.JWT_SECRET,
         { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
       );
@@ -49,7 +52,7 @@ class AuthController {
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
-          role: user.role
+          role: user.role.name
         }
       });
     } catch (error) {

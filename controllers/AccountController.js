@@ -68,6 +68,21 @@ class AccountController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  /**
+   * Delete an account
+   */
+  static async delete(req, res) {
+    try {
+      const account = await Account.findByPk(req.params.id);
+      if (!account) return res.status(404).json({ message: 'Account not found' });
+      
+      await account.destroy();
+      res.json({ message: 'Account deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = AccountController;

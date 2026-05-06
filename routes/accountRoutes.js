@@ -7,5 +7,6 @@ const authorize = require('../middleware/authorize');
 router.get('/', authenticate, authorize('admin'), AccountController.getAll);
 router.post('/', authenticate, authorize('admin', 'client'), AccountController.create);
 router.get('/:id', authenticate, AccountController.getById);
+router.delete('/:id', authenticate, authorize('admin'), AccountController.delete);
 
 module.exports = router;
