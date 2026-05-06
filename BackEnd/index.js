@@ -40,7 +40,7 @@ db.sequelize.authenticate()
 
 
 // Routes
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
   res.json({ message: 'Welcome to the Banking System API' });
 });
 

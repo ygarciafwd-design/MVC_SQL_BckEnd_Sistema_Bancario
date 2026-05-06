@@ -59,6 +59,57 @@ class AuthController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  /**
+   * User registration
+   * Creates a new user account
+   */
+  static async register(req, res) {
+    try {
+      const { firstName, lastName, email, password, identityDocument } = req.body;
+
+      // 1. Basic validation
+      if (!firstName || !lastName || !email || !password || !identityDocument) {
+        return res.status(400).json({ message: 'All fields are required including Identity Document' });
+      }
+
+      // 2. Check if user already exists
+      const existingUser = await User.findOne({ where: { email } });
+      if (existingUser) {
+        return res.status(400).json({ message: 'User already exists' });
+      }
+
+      // 3. Get default role
+      const role = await Role.findOne({ where: { name: 'customer' } });
+      const role_id = role ? role.id : 1; // Default to 1 if not found
+
+      // 4. Hash password
+      const passwordHash = await bcrypt.hash(password, 10);
+
+      // 5. Create user
+      const newUser = await User.create({
+        firstName,
+        lastName,
+        email,
+        passwordHash,
+        identityDocument,
+        role_id,
+        status: 'active'
+      });
+
+      res.status(201).json({
+        message: 'User registered successfully',
+        user: {
+          id: newUser.id,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+          email: newUser.email
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = AuthController;

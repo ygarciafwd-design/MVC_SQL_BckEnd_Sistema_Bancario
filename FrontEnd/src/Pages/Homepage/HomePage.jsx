@@ -7,7 +7,7 @@ const HomePage = () => {
 
   useEffect(() => {
     // Test API connection
-    api.request('/')
+    api.request('')
       .then(data => setMessage(data.message))
       .catch(err => setMessage('Error al conectar con el servidor.'));
   }, []);

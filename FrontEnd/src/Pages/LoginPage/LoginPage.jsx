@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { api } from '../../services/api';
+import './LoginPage.css';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -55,6 +57,10 @@ const LoginPage = () => {
           <button type="submit" className="btn-primary login-submit" disabled={loading}>
             {loading ? 'Cargando...' : 'Entrar'}
           </button>
+          
+          <p style={{ marginTop: '1.5rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+            ¿No tienes cuenta? <Link to="/register" style={{ color: 'var(--primary)', fontWeight: '600' }}>Regístrate aquí</Link>
+          </p>
         </form>
       </div>
     </div>
