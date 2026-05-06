@@ -3,18 +3,29 @@ const { User, Role } = require('../models');
 
 /**
  * Middleware de autenticación JWT
- * Verifica que el request contenga un token válido en el header Authorization.
+ * Verifica que el request contenga un token válido.
+ * 
+ * Prioridad de lectura del token:
+ *   1. Cookie httpOnly llamada "token"
+ *   2. Header Authorization: Bearer <token>
+ * 
  * Si es válido, adjunta el usuario autenticado a req.user.
  */
 const authenticate = async (req, res, next) => {
   try {
-    // 1. Extraer el token del header
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ message: 'Access denied. No token provided.' });
+    // 1. Intentar leer el token desde la cookie primero, luego del header
+    let token = req.cookies?.token;
+
+    if (!token) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.split(' ')[1];
+      }
     }
 
-    const token = authHeader.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ message: 'Access denied. No token provided.' });
+    }
 
     // 2. Verificar y decodificar el token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);

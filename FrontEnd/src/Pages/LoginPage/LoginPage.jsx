@@ -1,12 +1,19 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { api } from '../../services/api';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
+import { useAuth } from '../../services/AuthContext';
 import './LoginPage.css';
 
 const LoginPage = () => {
+  const { login, user } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // If already logged in, redirect to home
+  if (user) {
+    return <Navigate to="/" replace />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -14,10 +21,8 @@ const LoginPage = () => {
     setError('');
 
     try {
-      const response = await api.auth.login(formData);
-      localStorage.setItem('token', response.token);
-      alert('¡Bienvenido de nuevo!');
-      window.location.href = '/';
+      await login(formData);
+      navigate('/');
     } catch (err) {
       setError(err.message);
     } finally {

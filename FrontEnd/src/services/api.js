@@ -1,7 +1,10 @@
-const BASE_URL = 'http://localhost:3000/api';
+const BASE_URL = '/api';
 
 export const api = {
-  // Generic fetch wrapper
+  /**
+   * Generic fetch wrapper.
+   * All requests include credentials to send/receive httpOnly cookies.
+   */
   async request(endpoint, options = {}) {
     const url = `${BASE_URL}${endpoint}`;
     const headers = {
@@ -9,14 +12,12 @@ export const api = {
       ...options.headers,
     };
 
-    // Add token if exists in localStorage
-    const token = localStorage.getItem('token');
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
     try {
-      const response = await fetch(url, { ...options, headers });
+      const response = await fetch(url, {
+        ...options,
+        headers,
+        credentials: 'include',  // Send cookies with every request
+      });
       const data = await response.json();
 
       if (!response.ok) {
@@ -30,7 +31,7 @@ export const api = {
     }
   },
 
-  // Auth methods
+  // ---- Auth ----
   auth: {
     login: (credentials) => api.request('/auth/login', {
       method: 'POST',
@@ -40,14 +41,42 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(userData),
     }),
+    logout: () => api.request('/auth/logout', { method: 'POST' }),
+    getProfile: () => api.request('/auth/profile'),
   },
 
-  // User methods
-  users: {
-    getProfile: () => api.request('/users/profile'),
+  // ---- Admin: User Management ----
+  admin: {
+    getUsers: () => api.request('/admin/users'),
+    getUserById: (id) => api.request(`/admin/users/${id}`),
+    createUser: (data) => api.request('/admin/users', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+    updateUserRole: (id, role_id) => api.request(`/admin/users/${id}/role`, {
+      method: 'PATCH',
+      body: JSON.stringify({ role_id }),
+    }),
+    updateUserStatus: (id, status) => api.request(`/admin/users/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    }),
+    deleteUser: (id) => api.request(`/admin/users/${id}`, { method: 'DELETE' }),
+
+    // ---- Admin: Role Management ----
+    getRoles: () => api.request('/admin/roles'),
+    createRole: (data) => api.request('/admin/roles', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+    updateRole: (id, data) => api.request(`/admin/roles/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+    deleteRole: (id) => api.request(`/admin/roles/${id}`, { method: 'DELETE' }),
   },
 
-  // Accounts methods
+  // ---- Accounts ----
   accounts: {
     getAll: () => api.request('/accounts'),
     getById: (id) => api.request(`/accounts/${id}`),

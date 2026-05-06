@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 import '../LoginPage/LoginPage.css';
 
 const RegisterPage = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({ 
     firstName: '', 
     lastName: '', 
@@ -35,7 +36,7 @@ const RegisterPage = () => {
       });
       setSuccess(true);
       setTimeout(() => {
-        window.location.href = '/login';
+        navigate('/login');
       }, 2000);
     } catch (err) {
       setError(err.message);
