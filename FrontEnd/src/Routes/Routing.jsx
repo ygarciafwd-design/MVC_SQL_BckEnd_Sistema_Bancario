@@ -18,19 +18,21 @@ function Routing() {
                     <Route path='login' element={<LoginPage />} />
                     <Route path='register' element={<RegisterPage />} />
 
-                    {/* Admin routes (protected: requires auth + admin role) */}
+                    {/* Management routes (Admin & Moderador) */}
                     <Route path='admin' element={
-                        <ProtectedRoute requiredRole="admin">
+                        <ProtectedRoute allowedRoles={['admin', 'moderador']}>
                             <AdminDashboard />
                         </ProtectedRoute>
                     } />
                     <Route path='admin/users' element={
-                        <ProtectedRoute requiredRole="admin">
+                        <ProtectedRoute allowedRoles={['admin', 'moderador']}>
                             <UserManagement />
                         </ProtectedRoute>
                     } />
+
+                    {/* Role Management (Admin ONLY) */}
                     <Route path='admin/roles' element={
-                        <ProtectedRoute requiredRole="admin">
+                        <ProtectedRoute allowedRoles={['admin']}>
                             <RoleManagement />
                         </ProtectedRoute>
                     } />

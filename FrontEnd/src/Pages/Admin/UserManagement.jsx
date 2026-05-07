@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../services/api';
+import { useAuth } from '../../services/AuthContext';
 import './Admin.css';
 
 const UserManagement = () => {
+  const { user: currentUser, isAdmin, isModerator } = useAuth();
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -122,44 +124,65 @@ const UserManagement = () => {
             </tr>
           </thead>
           <tbody>
-            {users.map(user => (
-              <tr key={user.id}>
-                <td>{user.id}</td>
-                <td>{user.firstName} {user.lastName}</td>
-                <td>{user.email}</td>
-                <td>{user.identityDocument}</td>
-                <td>
-                  <select
-                    className="admin-select"
-                    value={user.role_id}
-                    onChange={(e) => handleRoleChange(user.id, parseInt(e.target.value))}
-                  >
-                    {roles.map(role => (
-                      <option key={role.id} value={role.id}>{role.name}</option>
-                    ))}
-                  </select>
-                </td>
-                <td>
-                  <span className={`status-${user.status}`}>{user.status}</span>
-                </td>
-                <td>
-                  <div className="admin-actions">
-                    {user.status === 'active' ? (
-                      <button className="btn-sm btn-danger" onClick={() => handleStatusChange(user.id, 'blocked')}>
-                        Bloquear
-                      </button>
-                    ) : (
-                      <button className="btn-sm btn-success" onClick={() => handleStatusChange(user.id, 'active')}>
-                        Activar
-                      </button>
-                    )}
-                    <button className="btn-sm btn-danger" onClick={() => handleDelete(user.id, `${user.firstName} ${user.lastName}`)}>
-                      Eliminar
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {users.map(user => {
+              const isTargetAdmin = user.role?.name === 'admin';
+              const canEdit = isAdmin || (isModerator && !isTargetAdmin);
+
+              return (
+                <tr key={user.id}>
+                  <td>{user.id}</td>
+                  <td>{user.firstName} {user.lastName}</td>
+                  <td>{user.email}</td>
+                  <td>{user.identityDocument}</td>
+                  <td>
+                    <select
+                      className="admin-select"
+                      value={user.role_id}
+                      disabled={!canEdit}
+                      onChange={(e) => handleRoleChange(user.id, parseInt(e.target.value))}
+                    >
+                      {roles.map(role => (
+                        <option 
+                          key={role.id} 
+                          value={role.id}
+                          disabled={isModerator && role.name === 'admin'}
+                        >
+                          {role.name}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  <td>
+                    <span className={`status-${user.status}`}>{user.status}</span>
+                  </td>
+                  <td>
+                    <div className="admin-actions">
+                      {canEdit && (
+                        <>
+                          {user.status === 'active' ? (
+                            <button className="btn-sm btn-danger" onClick={() => handleStatusChange(user.id, 'blocked')}>
+                              Bloquear
+                            </button>
+                          ) : (
+                            <button className="btn-sm btn-success" onClick={() => handleStatusChange(user.id, 'active')}>
+                              Activar
+                            </button>
+                          )}
+                          <button 
+                            className="btn-sm btn-danger" 
+                            disabled={user.id === currentUser.id}
+                            onClick={() => handleDelete(user.id, `${user.firstName} ${user.lastName}`)}
+                          >
+                            Eliminar
+                          </button>
+                        </>
+                      )}
+                      {!canEdit && <span className="text-muted" style={{ fontSize: '0.8rem' }}>Protegido</span>}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -207,7 +230,13 @@ const UserManagement = () => {
                   onChange={e => setCreateForm({...createForm, role_id: e.target.value})}>
                   <option value="">Seleccionar rol...</option>
                   {roles.map(role => (
-                    <option key={role.id} value={role.id}>{role.name}</option>
+                    <option 
+                      key={role.id} 
+                      value={role.id}
+                      disabled={isModerator && role.name === 'admin'}
+                    >
+                      {role.name}
+                    </option>
                   ))}
                 </select>
               </div>

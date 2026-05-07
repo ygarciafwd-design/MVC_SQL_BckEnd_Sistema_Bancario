@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../services/AuthContext';
 
 const Navbar = () => {
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin, hasManagementAccess } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -22,8 +22,10 @@ const Navbar = () => {
 
           {user ? (
             <>
-              {isAdmin && (
-                <Link to="/admin" className="nav-link admin-link">⚙️ Admin</Link>
+              {hasManagementAccess && (
+                <Link to="/admin" className="nav-link admin-link">
+                  ⚙️ {isAdmin ? 'Admin' : 'Gestión'}
+                </Link>
               )}
               <span className="nav-user-info">
                 {user.firstName} <span className="role-badge">{user.role}</span>

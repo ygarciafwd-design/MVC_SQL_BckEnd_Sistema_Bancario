@@ -4,9 +4,9 @@ import { useAuth } from '../services/AuthContext';
 /**
  * ProtectedRoute — wraps a page element.
  *  - If not authenticated → redirect to /login
- *  - If requiredRole is specified and user doesn't have it → redirect to /
+ *  - If allowedRoles is specified and user doesn't have one of them → redirect to /
  */
-const ProtectedRoute = ({ children, requiredRole }) => {
+const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -21,8 +21,12 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (requiredRole && user.role !== requiredRole) {
-    return <Navigate to="/" replace />;
+  // allowedRoles can be a single string or an array of strings
+  if (allowedRoles) {
+    const rolesArray = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
+    if (!rolesArray.includes(user.role)) {
+      return <Navigate to="/" replace />;
+    }
   }
 
   return children;

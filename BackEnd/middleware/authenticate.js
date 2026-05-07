@@ -1,16 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { User, Role } = require('../models');
 
-/**
- * Middleware de autenticación JWT
- * Verifica que el request contenga un token válido.
- * 
- * Prioridad de lectura del token:
- *   1. Cookie httpOnly llamada "token"
- *   2. Header Authorization: Bearer <token>
- * 
- * Si es válido, adjunta el usuario autenticado a req.user.
- */
+
 const authenticate = async (req, res, next) => {
   try {
     // 1. Intentar leer el token desde la cookie primero, luego del header

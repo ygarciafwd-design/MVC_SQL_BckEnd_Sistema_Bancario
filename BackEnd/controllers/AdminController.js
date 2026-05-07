@@ -81,6 +81,11 @@ class AdminController {
         if (!roleExists) {
           return res.status(400).json({ message: `Role with id ${role_id} does not exist` });
         }
+
+        // Hierarchy check for creation
+        if (req.user.role.name === 'moderador' && roleExists.name === 'admin') {
+          return res.status(403).json({ message: 'Privileges insufficient: Moderators cannot create admins' });
+        }
       } else {
         // Default to 'client' role
         const clientRole = await Role.findOne({ where: { name: 'client' } });
@@ -145,10 +150,20 @@ class AdminController {
         return res.status(400).json({ message: `Role with id ${role_id} does not exist` });
       }
 
-      // Find user
-      const user = await User.findByPk(id);
+      // Find user with role
+      const user = await User.findByPk(id, { include: [{ model: Role, as: 'role' }] });
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Hierarchy check: Moderator cannot change role of an Admin
+      if (req.user.role.name === 'moderador' && user.role.name === 'admin') {
+        return res.status(403).json({ message: 'Privileges insufficient: Moderators cannot modify admins' });
+      }
+
+      // Hierarchy check: Moderator cannot promote someone to Admin
+      if (req.user.role.name === 'moderador' && role.name === 'admin') {
+        return res.status(403).json({ message: 'Privileges insufficient: Moderators cannot assign admin role' });
       }
 
       // Prevent admin from demoting themselves
@@ -183,9 +198,14 @@ class AdminController {
         return res.status(400).json({ message: `Status must be one of: ${validStatuses.join(', ')}` });
       }
 
-      const user = await User.findByPk(id);
+      const user = await User.findByPk(id, { include: [{ model: Role, as: 'role' }] });
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Hierarchy check: Moderator cannot change status of an Admin
+      if (req.user.role.name === 'moderador' && user.role.name === 'admin') {
+        return res.status(403).json({ message: 'Privileges insufficient: Moderators cannot modify admins' });
       }
 
       // Prevent admin from blocking themselves
@@ -207,10 +227,15 @@ class AdminController {
   static async deleteUser(req, res) {
     try {
       const { id } = req.params;
-      const user = await User.findByPk(id);
+      const user = await User.findByPk(id, { include: [{ model: Role, as: 'role' }] });
 
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Hierarchy check: Moderator cannot delete an Admin
+      if (req.user.role.name === 'moderador' && user.role.name === 'admin') {
+        return res.status(403).json({ message: 'Privileges insufficient: Moderators cannot delete admins' });
       }
 
       if (user.id === req.user.id) {
